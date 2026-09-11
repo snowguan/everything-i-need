@@ -1,0 +1,2139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AIGC 赛事档案馆 · AIGC Contest Archive</title>
+<link rel="stylesheet" href="https://miaoda.feishu.cn/fonts/css2?family=Noto+Sans+SC:wght@300;400;500;700;900&family=Noto+Serif+SC:wght@600;900&display=swap">
+<style>
+/* ===== 全局重置与变量 ===== */
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-card: #1a1a26;
+  --bg-card-hover: #22222f;
+  --border: #2a2a3a;
+  --border-light: #3a3a4f;
+  --text-primary: #f0f0f5;
+  --text-secondary: #a0a0b8;
+  --text-muted: #6a6a80;
+  --accent: #8b5cf6;
+  --accent-light: #a78bfa;
+  --accent-glow: rgba(139, 92, 246, 0.3);
+  --accent2: #06b6d4;
+  --accent2-light: #22d3ee;
+  --success: #10b981;
+  --warning: #f59e0b;
+  --danger: #ef4444;
+  --radius: 12px;
+  --radius-lg: 20px;
+  --shadow: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 40px rgba(0,0,0,0.6);
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* 背景装饰 */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background:
+    radial-gradient(ellipse at 20% 20%, rgba(139,92,246,0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 80%, rgba(6,182,212,0.06) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ===== 导航栏 ===== */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10, 10, 15, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 24px;
+}
+
+.navbar-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  text-decoration: none;
+  color: var(--text-primary);
+}
+
+.logo-icon {
+  width: 36px;
+  height: 36px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 14px;
+  color: white;
+  letter-spacing: -0.5px;
+}
+
+.logo-text {
+  font-size: 18px;
+  font-weight: 700;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent2-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.nav-link {
+  padding: 8px 16px;
+  border-radius: 8px;
+  color: var(--text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: var(--transition);
+  cursor: pointer;
+  border: none;
+  background: none;
+}
+
+.nav-link:hover, .nav-link.active {
+  color: var(--text-primary);
+  background: var(--bg-card);
+}
+
+.nav-link.schedule-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.schedule-badge {
+  background: var(--accent);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 1px 6px;
+  border-radius: 10px;
+  min-width: 18px;
+  text-align: center;
+}
+
+/* ===== 主容器 ===== */
+.container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== 首页 Hero ===== */
+.hero {
+  text-align: center;
+  padding: 48px 0 40px;
+}
+
+.hero-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(32px, 5vw, 56px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 16px;
+  background: linear-gradient(135deg, #fff 0%, var(--accent-light) 50%, var(--accent2-light) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-subtitle {
+  font-size: 16px;
+  color: var(--text-secondary);
+  max-width: 600px;
+  margin: 0 auto 32px;
+}
+
+/* ===== 搜索与筛选 ===== */
+.search-section {
+  margin-bottom: 32px;
+}
+
+.search-box {
+  position: relative;
+  max-width: 600px;
+  margin: 0 auto 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 14px 20px 14px 48px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-size: 15px;
+  transition: var(--transition);
+  outline: none;
+}
+
+.search-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-glow);
+}
+
+.search-input::placeholder { color: var(--text-muted); }
+
+.search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.filter-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.filter-label {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.filter-select {
+  padding: 7px 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  cursor: pointer;
+  outline: none;
+  transition: var(--transition);
+}
+
+.filter-select:focus { border-color: var(--accent); }
+
+.filter-select option { background: var(--bg-card); }
+
+/* ===== 统计栏 ===== */
+.stats-bar {
+  display: flex;
+  gap: 24px;
+  justify-content: center;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  text-align: center;
+}
+
+.stat-number {
+  font-size: 28px;
+  font-weight: 900;
+  background: linear-gradient(135deg, var(--accent-light), var(--accent2-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ===== 比赛卡片网格 ===== */
+.contest-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: 20px;
+}
+
+.contest-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+
+.contest-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--border-light);
+  box-shadow: var(--shadow-lg);
+}
+
+.contest-card-cover {
+  height: 160px;
+  position: relative;
+  overflow: hidden;
+}
+
+.contest-card-cover::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, var(--bg-card) 0%, transparent 60%);
+}
+
+.contest-card-body {
+  padding: 20px;
+}
+
+.contest-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 10px;
+}
+
+.contest-card-title {
+  font-size: 17px;
+  font-weight: 700;
+  line-height: 1.4;
+  flex: 1;
+  margin-right: 10px;
+}
+
+.status-badge {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 20px;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.status-open { background: rgba(16,185,129,0.15); color: var(--success); }
+.status-upcoming { background: rgba(245,158,11,0.15); color: var(--warning); }
+.status-closed { background: rgba(106,106,128,0.2); color: var(--text-muted); }
+
+.contest-card-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.meta-tag {
+  font-size: 12px;
+  padding: 3px 8px;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  color: var(--text-secondary);
+}
+
+.contest-card-prize {
+  font-size: 13px;
+  color: var(--accent-light);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.contest-card-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.contest-card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 14px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.contest-card-date {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.add-schedule-btn {
+  padding: 6px 14px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.add-schedule-btn:hover {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+
+.add-schedule-btn.scheduled {
+  background: rgba(139,92,246,0.2);
+  border-color: var(--accent);
+  color: var(--accent-light);
+}
+
+/* ===== 空状态 ===== */
+.empty-state {
+  text-align: center;
+  padding: 80px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.5;
+}
+
+.empty-state-text {
+  font-size: 16px;
+}
+
+/* ===== 比赛详情页 ===== */
+.back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+  margin-bottom: 24px;
+}
+
+.back-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.detail-header {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.detail-header::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--accent), var(--accent2));
+}
+
+.detail-title {
+  font-family: 'Noto Serif SC', serif;
+  font-size: clamp(24px, 4vw, 36px);
+  font-weight: 900;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+.detail-organizer {
+  font-size: 15px;
+  color: var(--text-secondary);
+  margin-bottom: 16px;
+}
+
+.detail-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.detail-prize {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent-light);
+  margin-bottom: 16px;
+}
+
+.detail-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.8;
+  margin-bottom: 20px;
+}
+
+.detail-actions {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.btn-primary {
+  padding: 10px 24px;
+  background: linear-gradient(135deg, var(--accent), #7c3aed);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+
+.btn-secondary {
+  padding: 10px 24px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  color: var(--text-primary);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.btn-secondary:hover {
+  border-color: var(--border-light);
+  background: var(--bg-card);
+}
+
+/* ===== 倒计时 ===== */
+.countdown-box {
+  background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(6,182,212,0.1));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.countdown-label {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+}
+
+.countdown-timer {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+}
+
+.countdown-unit {
+  text-align: center;
+}
+
+.countdown-number {
+  font-size: 32px;
+  font-weight: 900;
+  color: var(--accent-light);
+  font-variant-numeric: tabular-nums;
+}
+
+.countdown-unit-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+/* ===== 时间线 ===== */
+.timeline-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  margin-bottom: 24px;
+}
+
+.section-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-title::before {
+  content: '';
+  width: 4px;
+  height: 20px;
+  background: linear-gradient(to bottom, var(--accent), var(--accent2));
+  border-radius: 2px;
+}
+
+.timeline {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 0;
+  position: relative;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  left: 100px;
+  top: 8px;
+  bottom: 8px;
+  width: 2px;
+  background: var(--border);
+  transform: translateX(-50%);
+}
+
+.timeline-item {
+  display: contents;
+}
+
+.timeline-date {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 8px 16px 8px 0;
+  text-align: right;
+  position: relative;
+}
+
+.timeline-dot {
+  position: absolute;
+  right: -7px;
+  top: 12px;
+  width: 12px;
+  height: 12px;
+  background: var(--bg-card);
+  border: 3px solid var(--accent);
+  border-radius: 50%;
+  z-index: 1;
+}
+
+.timeline-dot.completed {
+  background: var(--success);
+  border-color: var(--success);
+}
+
+.timeline-dot.current {
+  background: var(--accent);
+  box-shadow: 0 0 0 4px var(--accent-glow);
+}
+
+.timeline-content {
+  padding: 4px 0 20px 24px;
+}
+
+.timeline-content-title {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.timeline-content-desc {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ===== 作品展示区 ===== */
+.works-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+}
+
+.works-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.collapse-all-btn {
+  padding: 8px 16px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-secondary);
+  font-size: 13px;
+  cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.collapse-all-btn:hover {
+  color: var(--text-primary);
+  border-color: var(--border-light);
+}
+
+.works-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.work-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: var(--transition);
+}
+
+.work-card:hover {
+  border-color: var(--border-light);
+}
+
+.work-poster {
+  position: relative;
+  aspect-ratio: 16/9;
+  cursor: pointer;
+  overflow: hidden;
+  background: var(--bg-card);
+}
+
+.work-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.work-poster:hover .work-poster-img {
+  transform: scale(1.05);
+}
+
+.work-poster-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 50%);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 16px;
+}
+
+.work-award-badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: linear-gradient(135deg, var(--accent), var(--accent2));
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 6px;
+}
+
+.work-play-icon {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 48px;
+  height: 48px;
+  background: rgba(255,255,255,0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.work-poster:hover .work-play-icon {
+  opacity: 1;
+}
+
+.work-info {
+  padding: 14px 16px;
+}
+
+.work-title {
+  font-size: 15px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.work-author {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+/* ===== 评论区 ===== */
+.comments-panel {
+  border-top: 1px solid var(--border);
+  background: var(--bg-card);
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.4s ease;
+}
+
+.comments-panel.open {
+  max-height: 500px;
+}
+
+.comments-inner {
+  padding: 16px;
+}
+
+.comments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.comments-count {
+  font-size: 13px;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.comment-toggle-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: var(--transition);
+}
+
+.comment-toggle-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+}
+
+.comment-input-area {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.comment-input {
+  flex: 1;
+  padding: 8px 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-primary);
+  font-size: 13px;
+  outline: none;
+  transition: var(--transition);
+}
+
+.comment-input:focus {
+  border-color: var(--accent);
+}
+
+.comment-submit {
+  padding: 8px 16px;
+  background: var(--accent);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.comment-submit:hover {
+  background: #7c3aed;
+}
+
+.comments-list {
+  max-height: 240px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.comments-list::-webkit-scrollbar { width: 4px; }
+.comments-list::-webkit-scrollbar-track { background: transparent; }
+.comments-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.comment-item {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+
+.comment-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.comment-author {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent-light);
+}
+
+.comment-time {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.comment-text {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.no-comments {
+  text-align: center;
+  padding: 16px;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+/* ===== 我的赛程页 ===== */
+.schedule-page {
+  min-height: 60vh;
+}
+
+.schedule-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.schedule-item {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  transition: var(--transition);
+}
+
+.schedule-item:hover {
+  border-color: var(--border-light);
+}
+
+.schedule-item-info {
+  flex: 1;
+  cursor: pointer;
+}
+
+.schedule-item-title {
+  font-size: 16px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+
+.schedule-item-meta {
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.schedule-item-countdown {
+  text-align: center;
+  min-width: 120px;
+}
+
+.schedule-countdown-number {
+  font-size: 24px;
+  font-weight: 900;
+  color: var(--accent-light);
+}
+
+.schedule-countdown-label {
+  font-size: 11px;
+  color: var(--text-muted);
+}
+
+.schedule-remove-btn {
+  padding: 6px 12px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 12px;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.schedule-remove-btn:hover {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+/* ===== Toast 通知 ===== */
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.toast {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast.success { border-left: 3px solid var(--success); }
+.toast.info { border-left: 3px solid var(--accent); }
+
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes fadeOut {
+  to { opacity: 0; transform: translateY(10px); }
+}
+
+/* ===== 页脚 ===== */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 32px 24px;
+  text-align: center;
+  color: var(--text-muted);
+  font-size: 13px;
+  position: relative;
+  z-index: 1;
+}
+
+.footer a {
+  color: var(--accent-light);
+  text-decoration: none;
+}
+
+/* ===== 响应式 ===== */
+@media (max-width: 768px) {
+  .navbar-inner { height: 56px; }
+  .container { padding: 20px 16px; }
+  .hero { padding: 32px 0 24px; }
+  .contest-grid { grid-template-columns: 1fr; }
+  .works-grid { grid-template-columns: 1fr; }
+  .detail-header { padding: 20px; }
+  .timeline { grid-template-columns: 80px 1fr; }
+  .timeline::before { left: 80px; }
+  .schedule-item { flex-direction: column; text-align: center; }
+  .countdown-timer { gap: 10px; }
+  .countdown-number { font-size: 24px; }
+  .nav-link { padding: 6px 10px; font-size: 13px; }
+}
+
+@media (max-width: 480px) {
+  .filters { flex-direction: column; align-items: stretch; }
+  .filter-group { justify-content: space-between; }
+  .detail-actions { flex-direction: column; }
+  .btn-primary, .btn-secondary { justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== 导航栏 ===== -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <a class="logo" onclick="navigate('home')">
+      <div class="logo-icon">AI</div>
+      <span class="logo-text">AIGC 赛事档案馆</span>
+    </a>
+    <div class="nav-links">
+      <button class="nav-link active" id="nav-home" onclick="navigate('home')">全部赛事</button>
+      <button class="nav-link schedule-btn" id="nav-schedule" onclick="navigate('schedule')">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        我的赛程
+        <span class="schedule-badge" id="schedule-badge" style="display:none">0</span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+<!-- ===== 主内容区 ===== -->
+<div class="container" id="app">
+  <!-- 动态渲染 -->
+</div>
+
+<!-- ===== Toast 容器 ===== -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ===== 页脚 ===== -->
+<footer class="footer">
+  <p>AIGC 赛事档案馆 · 每周自动更新赛事数据 · 评论数据保存在本地浏览器</p>
+  <p style="margin-top:8px">作品版权归原作者及赛事主办方所有，本站仅作信息聚合与交流</p>
+</footer>
+
+<script>
+// ===== 比赛数据 =====
+const CONTESTS = [
+  {
+    id: "runway-aif-2026",
+    name: "Runway AI Film Festival 2026",
+    organizer: "Runway",
+    year: 2026,
+    category: "AI短片/影像",
+    region: "国际",
+    prize: "总奖池 $135,000+，Grand Prix $50,000 + 100万 Runway 积分",
+    website: "https://aif.runwayml.com/",
+    description: "Runway 主办的年度 AI 电影节，2026 年扩展至电影、新媒体、游戏、设计、广告、时尚六大类别。在纽约 Alice Tully Hall 和洛杉矶 The Broad Stage 展映，是全球最具影响力的 AI 影像赛事之一。评委包括 Roger Avary 及 Adobe、NVIDIA 代表。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+    timeline: [
+      { date: "2026-01", title: "征集开启", desc: "全球作品征集启动" },
+      { date: "2026-04-20", title: "提交截止", desc: "作品提交最后期限" },
+      { date: "2026-05", title: "评审阶段", desc: "评委团评审入围作品" },
+      { date: "2026-06-11", title: "纽约展映", desc: "Alice Tully Hall 颁奖典礼" },
+      { date: "2026-06-18", title: "洛杉矶展映", desc: "The Broad Stage 展映" }
+    ],
+    tags: ["AI视频", "短片", "电影节", "国际"],
+    works: [
+      { id: "r1", title: "A Face Only A Mother Could Love", author: "Robert Gaudette", award: "2026 Grand Prix", rank: 1, gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", link: "https://aif.runwayml.com/", desc: "2026 年度最高奖，8分钟巴黎故事，奖金 $50,000，官网内嵌视频播放" },
+      { id: "r2", title: "《此前或此后》", author: "中国创作者", award: "2026 全球十强", rank: 2, gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)", link: "https://www.bilibili.com/video/BV1M6jt6qEY4/", desc: "入围 2026 Runway AI Film Festival 全球十强，纽约林肯中心展映" },
+      { id: "r4", title: "Total Pixel Space", author: "Jacob Adler", award: "2025 Grand Prix", rank: 0, gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)", link: "https://watchaishortfilms.com/films/total-pixel-space", desc: "2025 年 Grand Prix，9分钟哲学散文电影，可在线完整观看" }
+    ]
+  },
+  {
+    id: "runway-hundred-fund",
+    name: "Runway Hundred Film Fund",
+    organizer: "Runway",
+    year: 2026,
+    category: "AI长片资助",
+    region: "国际",
+    prize: "总基金 $500万–$1000万，单项目 $5,000–$1,000,000+",
+    website: "https://runwayml.com/hundred-film-fund",
+    description: "Runway 推出的 AI 电影资助计划，旨在支持用生成式 AI 制作长篇电影的创作者。顾问团包括翠贝卡电影节联合创始人 Jane Rosenthal、《爱尔兰人》制片人等业界人物。另配套最高 200 万美元的 Runway 平台积分。",
+    coverGradient: "linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #2d1b4e 100%)",
+    timeline: [
+      { date: "2026-01", title: "申请开放", desc: "项目申请通道开启" },
+      { date: "2026-09-03", title: "生成窗口截止", desc: "AI 视频生成窗口结束" },
+      { date: "2026-Q4", title: "项目评审", desc: "评审委员会审核项目" },
+      { date: "2027", title: "资助发放", desc: "获选项目获得资金与算力支持" }
+    ],
+    tags: ["AI长片", "资助基金", "国际"],
+    works: []
+  },
+  {
+    id: "higgsfield-global-2026",
+    name: "Higgsfield Global Film Festival",
+    organizer: "Higgsfield",
+    year: 2026,
+    category: "AI视频",
+    region: "国际",
+    prize: "$1,000,000 现金奖，14 个获奖席位",
+    website: "https://higgsfield.com/",
+    description: "Higgsfield 主办的全球 AI 电影节，以百万美元现金奖成为 AI 视频领域奖金最高的赛事之一。赛事旨在通过竞赛驱动产品增长，要求创作者深度使用 Higgsfield 工具进行 AI 视频创作。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%)",
+    timeline: [
+      { date: "2026-06", title: "征集开启", desc: "全球作品征集启动" },
+      { date: "2026-09-03", title: "提交截止", desc: "太平洋时间 11:59 PM 截止" },
+      { date: "2026-10", title: "评审与公布", desc: "评审并公布获奖名单" }
+    ],
+    tags: ["AI视频", "高奖金", "国际"],
+    works: []
+  },
+  {
+    id: "sv-aff-2026",
+    name: "Silicon Valley AI Film Festival",
+    organizer: "SVAiFF",
+    year: 2026,
+    category: "AI电影",
+    region: "国际",
+    prize: "Grand Prix 20万 Pollo AI 积分 + $4,000 等值奖励",
+    website: "https://www.svaiff.com/",
+    description: "硅谷 AI 电影节，聚焦 AI 技术与电影艺术的融合。设立跨类别评审大奖和评委会大奖，表彰在艺术性、叙事和 AI 技术应用方面达到最高水准的作品。",
+    coverGradient: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)",
+    timeline: [
+      { date: "2026-03", title: "征集开启", desc: "作品征集启动" },
+      { date: "2026-08", title: "提交截止", desc: "早鸟与常规截止" },
+      { date: "2026-11", title: "电影节展映", desc: "硅谷线下展映与颁奖" }
+    ],
+    tags: ["AI电影", "电影节", "国际"],
+    works: []
+  },
+  {
+    id: "waiff-kyoto-2026",
+    name: "World AI Film Festival 2026 in KYOTO",
+    organizer: "WAIFF",
+    year: 2026,
+    category: "AI电影/动画",
+    region: "国际",
+    prize: "各奖项 100万日元（约 ¥48,000）",
+    website: "https://worldaifilmfestival.jp/",
+    description: "在日本京都举办的世界 AI 电影节，设立最佳 AI 电影、最佳 AI 动画、最佳 PocketANIME 等多个奖项，是亚洲最具代表性的 AI 影像赛事之一。",
+    coverGradient: "linear-gradient(135deg, #2c3e50 0%, #4ca1af 50%, #c4e0e5 100%)",
+    timeline: [
+      { date: "2026-01", title: "征集开启", desc: "全球作品征集" },
+      { date: "2026-03", title: "提交截止", desc: "作品提交最后期限" },
+      { date: "2026-04-21", title: "颁奖典礼", desc: "巴黎 Palais de Tokyo 颁奖" }
+    ],
+    tags: ["AI电影", "AI动画", "国际", "日本"],
+    works: []
+  },
+  {
+    id: "bjiff-aigc-2024",
+    name: "第十四届北京国际电影节 AIGC 电影短片单元",
+    organizer: "北京国际电影节 + 中国传媒大学",
+    year: 2024,
+    category: "AI短片",
+    region: "国内",
+    prize: "最佳影片/最佳创意/最佳美术/最佳视效/最佳人气",
+    website: "https://bjiff.com/",
+    description: "第十四届北京国际电影节首次设立 AIGC 电影短片单元，在中国传媒大学动画与数字艺术学院及保利影城天安门店举办。收到来自世界各地 430 多部作品，23 部入围终评。最佳影片《致亲爱的自己》后续获首届威尼斯 AI 生成短片国际电影节一等奖。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+    timeline: [
+      { date: "2024-01", title: "征集开启", desc: "全球 AIGC 短片征集" },
+      { date: "2024-03", title: "提交截止", desc: "作品提交最后期限" },
+      { date: "2024-04-24", title: "颁奖典礼", desc: "保利影城天安门店颁奖" }
+    ],
+    tags: ["AIGC", "电影节", "国内", "高校", "首届"],
+    works: [
+      { id: "b14-1", title: "《致亲爱的自己 To Dear Me》", author: "童画（中国传媒大学）", award: "最佳影片 + 威尼斯一等奖", rank: 1, gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", link: "https://www.bilibili.com/video/BV1Km411m7Gm/", desc: "北影节首届AIGC最佳影片，蒲公英隐喻女孩追寻自我，获威尼斯AI生成短片电影节第一名" },
+      { id: "b14-2", title: "《颅内花园》", author: "待补充", award: "最佳视效", rank: 2, gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)", link: "https://bjiff.com/bannergdtp/202404/t20240427_178198.html", desc: "第十四届北影节 AIGC 单元最佳视效影片" }
+    ]
+  },
+  {
+    id: "bjiff-aigc-2025",
+    name: "北京国际电影节 AIGC 电影单元",
+    organizer: "北京国际电影节",
+    year: 2025,
+    category: "AI短片",
+    region: "国内",
+    prize: "最佳影片/最佳导演/最佳音效等荣誉 + 行业展映",
+    website: "https://bjiff.com/",
+    description: "第十五届北京国际电影节首次设立 AIGC 电影单元，以'光影AI，共筑未来'为主题，在中国传媒大学举办荣誉盛典。表彰全球范围内利用 AIGC 进行电影创作的杰出作品与人才，设专业组和高校组。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #e94560 50%, #16213e 100%)",
+    timeline: [
+      { date: "2025-01", title: "征集开启", desc: "AIGC 电影单元作品征集" },
+      { date: "2025-03", title: "提交截止", desc: "作品提交最后期限" },
+      { date: "2025-04-25", title: "荣誉盛典", desc: "中国传媒大学颁奖典礼" }
+    ],
+    tags: ["AIGC", "电影节", "国内", "高校"],
+    works: [
+      { id: "b1", title: "《出神》", author: "何如伦（北京电影学院硕士）", award: "高校组最佳影片", rank: 1, gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", link: "https://www.bilibili.com/video/BV1VJTRzCECy/", desc: "蒙古语 AI 短片，文化记忆的数字萨满之旅，入围第47届莫斯科国际电影节" },
+      { id: "b2", title: "《杀手》", author: "白马少年", award: "优秀奖", rank: 2, gradient: "linear-gradient(135deg, #8e9eab 0%, #eef2f3 100%)", link: "https://www.zcool.com.cn/work/ZNzI4MDM4NjA=.html", desc: "黑色幽默奇幻短片，获第十六届巴黎中国电影节主竞赛大奖，站酷可观看" }
+    ]
+  },
+  {
+    id: "bjiff-aigc-2026",
+    name: "第十六届北京国际电影节 AIGC 单元",
+    organizer: "北京国际电影节",
+    year: 2026,
+    category: "AI短片",
+    region: "国内",
+    prize: "最佳AI主题短片/最佳影片等荣誉 + 行业展映",
+    website: "https://bjiff.com/",
+    description: "第十六届北京国际电影节 AIGC 电影单元，全球 3000 多部作品参赛。西南石油大学《Rest》斩获唯一最佳 AI 主题短片大奖，青岛科技大学《Alaris》获优秀影片奖。",
+    coverGradient: "linear-gradient(135deg, #0f0c29 0%, #e94560 50%, #302b63 100%)",
+    timeline: [
+      { date: "2026-01", title: "征集开启", desc: "AIGC 电影单元作品征集" },
+      { date: "2026-03", title: "提交截止", desc: "作品提交最后期限" },
+      { date: "2026-04-24", title: "颁奖典礼", desc: "第十六届北影节 AIGC 单元颁奖" }
+    ],
+    tags: ["AIGC", "电影节", "国内", "高校"],
+    works: [
+      { id: "b16-1", title: "《Rest》", author: "张博宇、张闯业等（西南石油大学）", award: "最佳AI主题短片", rank: 1, gradient: "linear-gradient(135deg, #434343 0%, #000000 100%)", link: "https://www.iesdouyin.com/share/video/7642614235909868836", desc: "反战题材 AIGC 短片，全球3000多部作品中突围，获唯一最佳AI主题短片大奖" },
+      { id: "b16-2", title: "《七日浮生》", author: "刘驰团队", award: "最佳长片", rank: 2, gradient: "linear-gradient(135deg, #2193b0 0%, #6dd5ed 100%)", link: "https://www.bilibili.com/video/BV1NRGt6WEki/", desc: "获最佳AIGC长片奖，严密AI全链路工作流完成人物一致性与复杂叙事" },
+      { id: "b16-3", title: "《霉》Mold", author: "孟柯（观念僧）", award: "最佳导演 + 最佳技术突破", rank: 3, gradient: "linear-gradient(135deg, #232526 0%, #414345 100%)", link: "https://www.bilibili.com/video/BV1Md7y6sEfU/", desc: "首部AIGC韩语悬疑长片，55分钟，包揽北影节最佳导演和最佳技术突破两项大奖" },
+      { id: "b16-4", title: "《牡丹记》", author: "刘雨晴、OYO孙老师", award: "短片组最佳影片 + 最佳美术设计", rank: 4, gradient: "linear-gradient(135deg, #ee9ca7 0%, #ffdde1 100%)", link: "https://www.bilibili.com/video/BV1NMokBTE7h/", desc: "北影节AIGC短片组最佳影片，获MIT黑客松最佳视觉奖，B站完整版可看" },
+      { id: "b16-5", title: "《羚灵颂》", author: "卢奎元（卢九霖）", award: "舞蹈影像AIGC最佳影片", rank: 5, gradient: "linear-gradient(135deg, #f7971e 0%, #ffd200 100%)", link: "https://m.manamana.net/video/detail/2981396", desc: "全AIGC舞蹈影像力作，以可可西里生态保卫战为背景，获首尔国际AI电影节最佳音效设计奖" }
+    ]
+  },
+  {
+    id: "siff-aigc-2025",
+    name: "上海国际电影节 AIGC 单元",
+    organizer: "上海国际电影节",
+    year: 2025,
+    category: "AI电影",
+    region: "国内",
+    prize: "最佳导演/最佳创意等荣誉",
+    website: "https://www.siff.com/",
+    description: "第二十七届上海国际电影节设立 AIGC 单元，北京电影学院杨艺航作品《CLEAN》获最佳导演奖。上海大学徐响作品《潜入梦海》获最佳创意荣誉奖。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #0f3460 50%, #e94560 100%)",
+    timeline: [
+      { date: "2025-02", title: "征集开启", desc: "AIGC 单元作品征集" },
+      { date: "2025-04", title: "提交截止", desc: "作品提交最后期限" },
+      { date: "2025-06", title: "电影节展映", desc: "上海国际电影节期间展映颁奖" }
+    ],
+    tags: ["AIGC", "电影节", "国内"],
+    works: [
+      { id: "s1", title: "《CLEAN 清理》", author: "杨艺航、张明达（北京电影学院）", award: "最佳导演奖", rank: 1, gradient: "linear-gradient(135deg, #000000 0%, #434343 100%)", link: "https://www.bilibili.com/video/BV1bmKVzJEVA/", desc: "第二十七届上影节 AIGC 单元最佳导演奖，未来社会清洁机器人的寓言故事" },
+      { id: "s2", title: "《金鱼》", author: "阿米（杨子强）", award: "最佳视效奖", rank: 2, gradient: "linear-gradient(135deg, #2b5876 0%, #4e4376 100%)", link: "https://www.bilibili.com/video/BV1ZtKVzAE9z/", desc: "怪诞职场悬疑 AI 短片，获上影节 AIGC 单元最佳视效荣誉" }
+    ]
+  },
+  {
+    id: "douyin-ai-contest-2026",
+    name: "抖音 AI 创作大赛",
+    organizer: "抖音",
+    year: 2026,
+    category: "AI视频/综合",
+    region: "国内",
+    prize: "400万现金 + 上亿流量激励 + 原创IP开发",
+    website: "https://www.douyin.com/",
+    description: "抖音主办的 AI 创作大赛，总奖池包含 400 万元现金奖励、上亿流量激励、原创 IP 开发等多元权益。开放与命题赛道共设 128 个入围作品名额，评委来自专业背景，从设定完整度、视听表达、创新能力、技术水平等维度评选。",
+    coverGradient: "linear-gradient(135deg, #000000 0%, #1a1a2e 50%, #e94560 100%)",
+    timeline: [
+      { date: "2026-06", title: "大赛官宣", desc: "抖音 AI 创作大赛正式启动" },
+      { date: "2026-08", title: "征集截止", desc: "作品提交最后期限" },
+      { date: "2026-09", title: "评审阶段", desc: "专业评委团评审" },
+      { date: "2026-10", title: "结果公布", desc: "获奖名单公布与展映" }
+    ],
+    tags: ["AI视频", "高奖金", "国内", "流量扶持"],
+    works: []
+  },
+  {
+    id: "vacat-award-2026",
+    name: "瓦卡奖 VACAT AI 视觉创意大赛",
+    organizer: "抖音 + 深圳龙岗区",
+    year: 2026,
+    category: "AI视觉",
+    region: "国内",
+    prize: "视频金奖2万，穹顶巨幕最高8万，Dou+流量扶持",
+    website: "https://www.52shejisai.com/6129.html",
+    description: "全球 AI 视觉创意大赛（瓦卡奖 VACAT），致力于构建 AI 视觉创意界的'奥斯卡'平台。主赛道包含 AI 叙事短片、AI 视觉艺术、AI 平面视觉；专项赛道增设 AI 叙事长片、AI 公益宣传片、AI 微短剧与 AI 音乐视觉；特别赛道为 AI 穹顶巨幕专项创作。优胜者可申领创业孵化空间、算力资源，对接投融资。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+    timeline: [
+      { date: "2026-06", title: "第三届征稿启动", desc: "第三届瓦卡奖全球征稿" },
+      { date: "2026-09", title: "征稿截止", desc: "作品提交最后期限" },
+      { date: "2026-Q4", title: "瓦卡之夜", desc: "颁奖典礼与全国巡展" }
+    ],
+    tags: ["AI视觉", "国内", "创业扶持", "穹顶巨幕"],
+    works: []
+  },
+  {
+    id: "c4-aigc-2026",
+    name: "C4-AIGC 创新赛",
+    organizer: "教育部教指委 + 南开大学 + vivo",
+    year: 2026,
+    category: "AIGC创新",
+    region: "国内",
+    prize: "国家级竞赛荣誉 + 奖金",
+    website: "https://aigc.vivo.com.cn",
+    description: "中国高校计算机大赛（C4）系列竞赛之一，第三届（2026）'AIGC创新赛'由南开大学与 vivo 公司联合承办。面向全国高校学生，是教育部认可的国家级大学生竞赛。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%)",
+    timeline: [
+      { date: "2026-03", title: "报名开启", desc: "全国高校学生报名" },
+      { date: "2026-06", title: "初赛", desc: "线上初赛评审" },
+      { date: "2026-09", title: "总决赛", desc: "现场决赛与颁奖" }
+    ],
+    tags: ["高校竞赛", "AIGC", "国家级", "国内"],
+    works: []
+  },
+  {
+    id: "nebula-aigc-film-2026",
+    name: "华语科幻星云奖·全球AIGC长片创作大赛",
+    organizer: "华语科幻星云奖",
+    year: 2026,
+    category: "AI长片",
+    region: "国内",
+    prize: "总奖池 550万元，刘慈欣担任顾问",
+    website: "https://www.aitop100.cn/",
+    description: "华语科幻星云奖主办的全球 AIGC 长片创作大赛，总奖池 550 万元。刘慈欣担任顾问并限时免费开放 10 部科幻 IP 改编权。赛事聚焦用 AI 工具创作科幻长篇影像作品。",
+    coverGradient: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)",
+    timeline: [
+      { date: "2026-06", title: "大赛启动", desc: "全球 AIGC 长片创作大赛正式启动" },
+      { date: "2026-09", title: "IP 开放截止", desc: "10 部科幻 IP 免费改编权限时开放" },
+      { date: "2026-12", title: "作品提交", desc: "长片作品提交截止" },
+      { date: "2027", title: "评审颁奖", desc: "星云奖颁奖典礼" }
+    ],
+    tags: ["AI长片", "科幻", "高奖金", "国内"],
+    works: []
+  },
+  {
+    id: "zhangjiang-aigc-2026",
+    name: "张江杯国际青年AIGC视听内容创新创业大赛",
+    organizer: "上海张江",
+    year: 2026,
+    category: "AIGC视听",
+    region: "国内",
+    prize: "总奖励池 1100万元（百万现金 + 千万算力）",
+    website: "https://www.xingxiancn.com/article/42073",
+    description: "上海张江主办的国际青年 AIGC 视听内容创新创业大赛，总奖励池高达 1100 万元，包含百万现金与千万级算力支持。一等奖获 3000 元现金及算力，同步举办 AIGC 视听赋能营提供免费公益培训。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #0f3460 50%, #16213e 100%)",
+    timeline: [
+      { date: "2026-07", title: "大赛启动", desc: "张江杯 AIGC 视听大赛启动" },
+      { date: "2026-09", title: "报名截止", desc: "作品提交与报名截止" },
+      { date: "2026-10", title: "决赛颁奖", desc: "现场决赛与颁奖典礼" }
+    ],
+    tags: ["AIGC视听", "高奖金", "算力支持", "国内"],
+    works: []
+  },
+  {
+    id: "hk-aigc-contest-2026",
+    name: "香港国际AIGC文化数字内容创作大赛",
+    organizer: "香港",
+    year: 2026,
+    category: "多赛道",
+    region: "国内",
+    prize: "应用赛道第一名 10万港币，视频赛道第一名 2万港币",
+    website: "https://blog.csdn.net/ZengZiTudor/article/details/148307970",
+    description: "香港国际 AIGC 文化数字内容创作大赛，设应用赛道、视频创作、音乐创作、绘画创作四大赛道。总决赛为现场命题创作，需自备软件展示 AIGC 技巧。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #e94560 50%, #16213e 100%)",
+    timeline: [
+      { date: "2026-06", title: "初赛", desc: "线上作品提交与初审" },
+      { date: "2026-09", title: "总决赛", desc: "香港现场命题创作" }
+    ],
+    tags: ["AIGC", "多赛道", "香港", "国内"],
+    works: []
+  },
+  {
+    id: "shanghai-aigc-2026",
+    name: "第四届上海国际AIGC创新大赛",
+    organizer: "腾讯AI",
+    year: 2026,
+    category: "AI+游戏",
+    region: "国内",
+    prize: "游戏赛道总奖金池 ¥222,000，单项最高 ¥13,000",
+    website: "https://www.gcores.com/articles/218728",
+    description: "腾讯 AI 主办的第四届上海国际 AIGC 创新大赛，游戏赛道分为独立组与商业组，只要在游戏开发过程中使用了 AI 工具提升效率即可参赛。设 2 大核心奖项 + 7 大特色奖项。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+    timeline: [
+      { date: "2026-07", title: "报名开启", desc: "第四届大赛报名通道开启" },
+      { date: "2026-08", title: "报名截止", desc: "作品提交最后期限" },
+      { date: "2026-09", title: "决赛", desc: "上海国际 AIGC 创新大赛决赛" }
+    ],
+    tags: ["AI游戏", "国内", "腾讯"],
+    works: []
+  },
+  {
+    id: "global-ai-ip-2026",
+    name: "\"Global AI\"全球人工智能艺术IP设计大赛",
+    organizer: "Global AI",
+    year: 2026,
+    category: "AI艺术IP",
+    region: "国际",
+    prize: "全球金奖 15万元 + 永久艺术IP认证",
+    website: "https://www.shejijingsai.com/2026/08/1626475.html",
+    description: "全球人工智能艺术 IP 设计大赛，金奖作品将被正式认证为【Global AI·全球人类人工智能永久艺术 IP】，享有作者永久官方署名、全球巡展置顶推介、学术成果官方收录，优先对接实体雕塑落地、国际文创开发、官方全场景应用授权签约。",
+    coverGradient: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%)",
+    timeline: [
+      { date: "2026-08", title: "征集启动", desc: "全球 AI 艺术 IP 设计大赛启动" },
+      { date: "2026-11", title: "提交截止", desc: "作品提交最后期限" },
+      { date: "2026-12", title: "终审颁奖", desc: "官方终审与颁奖典礼" }
+    ],
+    tags: ["AI艺术", "IP设计", "高奖金", "国际"],
+    works: []
+  },
+  {
+    id: "adobe-firefly-2025",
+    name: "Adobe Firefly Contest",
+    organizer: "Adobe",
+    year: 2025,
+    category: "AI创意",
+    region: "国际",
+    prize: "$5,000 现金奖励",
+    website: "https://helpx.adobe.com/howifireflycontest.html",
+    description: "Adobe 官方举办的 Firefly 创意竞赛，展示创作者如何使用 Firefly 进行创意表达。获胜者可获得 5000 美元现金奖励。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #e94560 50%, #16213e 100%)",
+    timeline: [
+      { date: "2025-10", title: "征集开启", desc: "Adobe MAX 期间启动" },
+      { date: "2025-12", title: "提交截止", desc: "作品提交最后期限" },
+      { date: "2026-01", title: "结果公布", desc: "获胜者公布" }
+    ],
+    tags: ["AI创意", "Adobe", "国际"],
+    works: []
+  },
+  {
+    id: "ai-design-awards-2026",
+    name: "AI Design Awards 2026",
+    organizer: "Dead End Gallery（荷兰）",
+    year: 2026,
+    category: "AI图像/动态",
+    region: "国际",
+    prize: "AI Image/Motion Designer 2026 各 2000€ + 奖杯",
+    website: "https://designaward.ai/",
+    description: "在荷兰阿姆斯特丹 Dead End Gallery 举办的 AI 设计大奖，设 AI 图像设计师和 AI 动态设计师两个年度大奖，各 2000 欧元 + 奖杯。类别获奖者 250 欧元 + 奖杯。2026 年 5 月 30 日至 6 月 5 日展览。",
+    coverGradient: "linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%)",
+    timeline: [
+      { date: "2026-03", title: "征集开启", desc: "全球作品征集" },
+      { date: "2026-05", title: "提交截止", desc: "作品提交最后期限" },
+      { date: "2026-05-30", title: "展览开幕", desc: "Dead End Gallery 展览" }
+    ],
+    tags: ["AI设计", "国际", "荷兰"],
+    works: []
+  },
+  {
+    id: "bund-ai-arts-2026",
+    name: "外滩大会 AI 艺术节",
+    organizer: "蚂蚁集团",
+    year: 2026,
+    category: "AI艺术",
+    region: "国内",
+    prize: "展映 + 奖项 + 戛纳入选机会",
+    website: "https://ai-damn.com/ai-takes-the-stage-bund-conference-s-first-ai-arts-festival-1789012965391",
+    description: "2026 外滩大会首次设立 AI 艺术节，9 月 9 日至 12 日在上海举办。AI 概念艺术展展出 20 多位艺术家作品，包括 1985 年 AARON 系统的历史作品（首个签名 AI）。电影单元展映 100 多部 AI 电影，作品《One Thought》获奖并入选戛纳。",
+    coverGradient: "linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #e94560 100%)",
+    timeline: [
+      { date: "2026-09-09", title: "艺术节开幕", desc: "上海外滩大会 AI 艺术节启动" },
+      { date: "2026-09-12", title: "艺术节闭幕", desc: "为期 4 天的展映与颁奖" }
+    ],
+    tags: ["AI艺术", "国内", "电影节", "蚂蚁集团"],
+    works: []
+  }
+];
+
+// ===== 状态管理 =====
+const state = {
+  currentView: 'home',
+  currentContestId: null,
+  searchQuery: '',
+  filterYear: 'all',
+  filterStatus: 'all',
+  filterRegion: 'all',
+  filterCategory: 'all',
+  expandedComments: new Set(),
+  allCollapsed: false
+};
+
+// ===== localStorage 操作 =====
+const Storage = {
+  getComments(workId) {
+    const all = JSON.parse(localStorage.getItem('aigc_comments') || '{}');
+    return all[workId] || [];
+  },
+  addComment(workId, text) {
+    const all = JSON.parse(localStorage.getItem('aigc_comments') || '{}');
+    if (!all[workId]) all[workId] = [];
+    all[workId].unshift({
+      id: Date.now(),
+      text: text,
+      author: '访客',
+      time: new Date().toLocaleString('zh-CN', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })
+    });
+    localStorage.setItem('aigc_comments', JSON.stringify(all));
+    return all[workId];
+  },
+  getSchedule() {
+    return JSON.parse(localStorage.getItem('aigc_schedule') || '[]');
+  },
+  addToSchedule(contestId) {
+    const list = this.getSchedule();
+    if (!list.includes(contestId)) {
+      list.push(contestId);
+      localStorage.setItem('aigc_schedule', JSON.stringify(list));
+    }
+    return list;
+  },
+  removeFromSchedule(contestId) {
+    let list = this.getSchedule();
+    list = list.filter(id => id !== contestId);
+    localStorage.setItem('aigc_schedule', JSON.stringify(list));
+    return list;
+  },
+  isScheduled(contestId) {
+    return this.getSchedule().includes(contestId);
+  }
+};
+
+// ===== 工具函数 =====
+function getContestStatus(contest) {
+  const now = new Date();
+  const timeline = contest.timeline;
+  let deadline = null;
+  for (const item of timeline) {
+    if (item.title.includes('截止') || item.title.includes('提交')) {
+      deadline = new Date(item.date);
+      break;
+    }
+  }
+  if (!deadline) {
+    const last = timeline[timeline.length - 1];
+    deadline = new Date(last.date);
+  }
+  const start = new Date(timeline[0].date);
+  if (now < start) return { status: 'upcoming', label: '即将开始' };
+  if (now <= deadline) return { status: 'open', label: '征集中' };
+  return { status: 'closed', label: '已结束' };
+}
+
+function getDeadline(contest) {
+  for (const item of contest.timeline) {
+    if (item.title.includes('截止') || item.title.includes('提交')) {
+      return new Date(item.date);
+    }
+  }
+  return new Date(contest.timeline[contest.timeline.length - 1].date);
+}
+
+function getCountdown(deadline) {
+  const now = new Date();
+  const diff = deadline - now;
+  if (diff <= 0) return null;
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+  return { days, hours, minutes };
+}
+
+function showToast(message, type = 'info') {
+  const container = document.getElementById('toast-container');
+  const toast = document.createElement('div');
+  toast.className = `toast ${type}`;
+  toast.innerHTML = `<span>${message}</span>`;
+  container.appendChild(toast);
+  setTimeout(() => toast.remove(), 3000);
+}
+
+function updateScheduleBadge() {
+  const count = Storage.getSchedule().length;
+  const badge = document.getElementById('schedule-badge');
+  if (count > 0) {
+    badge.style.display = 'inline-block';
+    badge.textContent = count;
+  } else {
+    badge.style.display = 'none';
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+// ===== 路由 =====
+function navigate(view, contestId) {
+  state.currentView = view;
+  state.currentContestId = contestId;
+  if (view === 'home') {
+    location.hash = '#/';
+  } else if (view === 'contest') {
+    location.hash = `#/contest/${contestId}`;
+  } else if (view === 'schedule') {
+    location.hash = '#/schedule';
+  }
+  render();
+  window.scrollTo(0, 0);
+}
+
+function parseHash() {
+  const hash = location.hash.slice(2);
+  if (hash.startsWith('contest/')) {
+    const id = hash.replace('contest/', '');
+    return { view: 'contest', id };
+  } else if (hash === 'schedule') {
+    return { view: 'schedule' };
+  }
+  return { view: 'home' };
+}
+
+window.addEventListener('hashchange', () => {
+  const { view, id } = parseHash();
+  state.currentView = view;
+  state.currentContestId = id;
+  render();
+});
+
+// ===== 渲染：首页 =====
+function renderHome() {
+  const app = document.getElementById('app');
+  let filtered = CONTESTS.filter(c => {
+    if (state.searchQuery) {
+      const q = state.searchQuery.toLowerCase();
+      const match = c.name.toLowerCase().includes(q) ||
+        c.organizer.toLowerCase().includes(q) ||
+        c.tags.some(t => t.toLowerCase().includes(q)) ||
+        c.description.toLowerCase().includes(q);
+      if (!match) return false;
+    }
+    if (state.filterYear !== 'all' && c.year !== parseInt(state.filterYear)) return false;
+    if (state.filterRegion !== 'all' && c.region !== state.filterRegion) return false;
+    if (state.filterCategory !== 'all' && !c.category.includes(state.filterCategory)) return false;
+    if (state.filterStatus !== 'all') {
+      const st = getContestStatus(c).status;
+      if (st !== state.filterStatus) return false;
+    }
+    return true;
+  });
+
+  const totalWorks = CONTESTS.reduce((sum, c) => sum + c.works.length, 0);
+  const openCount = CONTESTS.filter(c => getContestStatus(c).status === 'open').length;
+  const years = [...new Set(CONTESTS.map(c => c.year))].sort((a, b) => b - a);
+  const categories = [...new Set(CONTESTS.map(c => c.category))];
+
+  app.innerHTML = `
+    <div class="hero">
+      <h1 class="hero-title">AIGC 赛事档案馆</h1>
+      <p class="hero-subtitle">汇聚全球重要 AIGC 艺术赛事，浏览获奖作品、交流评论、追踪参赛日程</p>
+    </div>
+    <div class="search-section">
+      <div class="search-box">
+        <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        <input type="text" class="search-input" id="search-input" placeholder="搜索比赛名称、主办方、标签..." value="${state.searchQuery}">
+      </div>
+      <div class="filters">
+        <div class="filter-group">
+          <span class="filter-label">年份</span>
+          <select class="filter-select" id="filter-year">
+            <option value="all">全部</option>
+            ${years.map(y => `<option value="${y}" ${state.filterYear == y ? 'selected' : ''}>${y}</option>`).join('')}
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">状态</span>
+          <select class="filter-select" id="filter-status">
+            <option value="all">全部</option>
+            <option value="open" ${state.filterStatus === 'open' ? 'selected' : ''}>征集中</option>
+            <option value="upcoming" ${state.filterStatus === 'upcoming' ? 'selected' : ''}>即将开始</option>
+            <option value="closed" ${state.filterStatus === 'closed' ? 'selected' : ''}>已结束</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">地区</span>
+          <select class="filter-select" id="filter-region">
+            <option value="all">全部</option>
+            <option value="国际" ${state.filterRegion === '国际' ? 'selected' : ''}>国际</option>
+            <option value="国内" ${state.filterRegion === '国内' ? 'selected' : ''}>国内</option>
+          </select>
+        </div>
+        <div class="filter-group">
+          <span class="filter-label">类别</span>
+          <select class="filter-select" id="filter-category">
+            <option value="all">全部</option>
+            ${categories.map(cat => `<option value="${cat}" ${state.filterCategory === cat ? 'selected' : ''}>${cat}</option>`).join('')}
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="stats-bar">
+      <div class="stat-item"><div class="stat-number">${CONTESTS.length}</div><div class="stat-label">收录赛事</div></div>
+      <div class="stat-item"><div class="stat-number">${totalWorks}</div><div class="stat-label">获奖作品</div></div>
+      <div class="stat-item"><div class="stat-number">${openCount}</div><div class="stat-label">正在征集</div></div>
+    </div>
+    ${filtered.length === 0 ? `
+      <div class="empty-state">
+        <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg></div>
+        <div class="empty-state-text">没有找到匹配的比赛，试试其他关键词或筛选条件</div>
+      </div>
+    ` : `<div class="contest-grid">${filtered.map(c => renderContestCard(c)).join('')}</div>`}
+  `;
+
+  document.getElementById('search-input').addEventListener('input', (e) => {
+    state.searchQuery = e.target.value;
+    renderHome();
+    const input = document.getElementById('search-input');
+    input.focus();
+    input.setSelectionRange(input.value.length, input.value.length);
+  });
+  document.getElementById('filter-year').addEventListener('change', (e) => { state.filterYear = e.target.value; renderHome(); });
+  document.getElementById('filter-status').addEventListener('change', (e) => { state.filterStatus = e.target.value; renderHome(); });
+  document.getElementById('filter-region').addEventListener('change', (e) => { state.filterRegion = e.target.value; renderHome(); });
+  document.getElementById('filter-category').addEventListener('change', (e) => { state.filterCategory = e.target.value; renderHome(); });
+
+  filtered.forEach(c => {
+    const card = document.getElementById(`card-${c.id}`);
+    if (card) card.addEventListener('click', (e) => {
+      if (!e.target.closest('.add-schedule-btn')) navigate('contest', c.id);
+    });
+    const btn = document.getElementById(`schedule-btn-${c.id}`);
+    if (btn) btn.addEventListener('click', (e) => { e.stopPropagation(); toggleSchedule(c.id); });
+  });
+}
+
+function renderContestCard(c) {
+  const { status, label } = getContestStatus(c);
+  const statusClass = status === 'open' ? 'status-open' : status === 'upcoming' ? 'status-upcoming' : 'status-closed';
+  const scheduled = Storage.isScheduled(c.id);
+  const deadline = getDeadline(c);
+  const deadlineStr = deadline.toLocaleDateString('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' });
+  return `
+    <div class="contest-card" id="card-${c.id}">
+      <div class="contest-card-cover" style="background: ${c.coverGradient}">
+        <div style="position:absolute;bottom:16px;left:20px;right:20px;z-index:1;">
+          <div style="font-size:12px;color:rgba(255,255,255,0.7);margin-bottom:4px;">${c.organizer} · ${c.year}</div>
+        </div>
+      </div>
+      <div class="contest-card-body">
+        <div class="contest-card-header">
+          <div class="contest-card-title">${c.name}</div>
+          <span class="status-badge ${statusClass}">${label}</span>
+        </div>
+        <div class="contest-card-meta">
+          <span class="meta-tag">${c.category}</span>
+          <span class="meta-tag">${c.region}</span>
+          ${c.tags.slice(0, 2).map(t => `<span class="meta-tag">${t}</span>`).join('')}
+        </div>
+        <div class="contest-card-prize">${c.prize}</div>
+        <div class="contest-card-desc">${c.description}</div>
+        <div class="contest-card-footer">
+          <span class="contest-card-date">截止：${deadlineStr}</span>
+          <button class="add-schedule-btn ${scheduled ? 'scheduled' : ''}" id="schedule-btn-${c.id}">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            ${scheduled ? '已加入' : '加入赛程'}
+          </button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ===== 渲染：比赛详情 =====
+function renderContestDetail() {
+  const app = document.getElementById('app');
+  const contest = CONTESTS.find(c => c.id === state.currentContestId);
+  if (!contest) {
+    app.innerHTML = '<div class="empty-state"><div class="empty-state-text">比赛不存在</div></div>';
+    return;
+  }
+  const { status, label } = getContestStatus(contest);
+  const statusClass = status === 'open' ? 'status-open' : status === 'upcoming' ? 'status-upcoming' : 'status-closed';
+  const deadline = getDeadline(contest);
+  const countdown = getCountdown(deadline);
+  const scheduled = Storage.isScheduled(contest.id);
+  const now = new Date();
+
+  app.innerHTML = `
+    <button class="back-btn" onclick="navigate('home')">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+      返回列表
+    </button>
+    <div class="detail-header">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:12px;">
+        <div style="flex:1;min-width:200px;">
+          <h1 class="detail-title">${contest.name}</h1>
+          <div class="detail-organizer">主办方：${contest.organizer} · ${contest.year} · ${contest.region}</div>
+        </div>
+        <span class="status-badge ${statusClass}" style="font-size:13px;padding:6px 14px;">${label}</span>
+      </div>
+      <div class="detail-tags">
+        <span class="meta-tag">${contest.category}</span>
+        ${contest.tags.map(t => `<span class="meta-tag">${t}</span>`).join('')}
+      </div>
+      <div class="detail-prize">${contest.prize}</div>
+      <p class="detail-desc">${contest.description}</p>
+      <div class="detail-actions">
+        <a href="${contest.website}" target="_blank" class="btn-primary">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+          访问官网
+        </a>
+        <button class="btn-secondary" onclick="toggleSchedule('${contest.id}')">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          ${scheduled ? '已加入赛程' : '加入我的赛程'}
+        </button>
+      </div>
+    </div>
+    ${countdown ? `
+      <div class="countdown-box">
+        <div class="countdown-label">距离投稿截止还有</div>
+        <div class="countdown-timer">
+          <div class="countdown-unit"><div class="countdown-number">${countdown.days}</div><div class="countdown-unit-label">天</div></div>
+          <div class="countdown-unit"><div class="countdown-number">${countdown.hours}</div><div class="countdown-unit-label">时</div></div>
+          <div class="countdown-unit"><div class="countdown-number">${countdown.minutes}</div><div class="countdown-unit-label">分</div></div>
+        </div>
+      </div>
+    ` : ''}
+    <div class="timeline-section">
+      <div class="section-title">赛事时间线</div>
+      <div class="timeline">
+        ${contest.timeline.map((item, i) => {
+          const itemDate = new Date(item.date);
+          let dotClass = '';
+          if (itemDate < now) dotClass = 'completed';
+          else if (i === contest.timeline.findIndex(t => new Date(t.date) >= now)) dotClass = 'current';
+          return `
+            <div class="timeline-item">
+              <div class="timeline-date"><span class="timeline-dot ${dotClass}"></span>${item.date}</div>
+              <div class="timeline-content">
+                <div class="timeline-content-title">${item.title}</div>
+                <div class="timeline-content-desc">${item.desc}</div>
+              </div>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    </div>
+    <div class="works-section">
+      <div class="works-header">
+        <div class="section-title" style="margin-bottom:0;">获奖作品（${contest.works.length}）</div>
+        ${contest.works.length > 0 ? `
+        <button class="collapse-all-btn" onclick="toggleAllComments()">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 14 10 14 10 20"/><polyline points="20 10 14 10 14 4"/><line x1="14" y1="10" x2="21" y2="3"/><line x1="3" y1="21" x2="10" y2="14"/></svg>
+          <span id="collapse-all-text">${state.allCollapsed ? '展开全部评论' : '折叠全部评论'}</span>
+        </button>` : ''}
+      </div>
+      ${contest.works.length === 0 ? `
+        <div style="text-align:center;padding:40px 20px;color:var(--text-muted);">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="margin-bottom:12px;opacity:0.5;"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+          <div style="font-size:14px;">获奖作品视频正在收集中</div>
+          <div style="font-size:12px;margin-top:4px;">本届赛事结果公布后将补充作品链接，欢迎通过评论区提供线索</div>
+        </div>
+      ` : `
+      <div class="works-grid">
+        ${contest.works.map(w => renderWorkCard(w)).join('')}
+      </div>`}
+    </div>
+  `;
+
+  contest.works.forEach(w => {
+    const poster = document.getElementById(`poster-${w.id}`);
+    if (poster) poster.addEventListener('click', () => window.open(w.link, '_blank'));
+    const commentToggle = document.getElementById(`comment-toggle-${w.id}`);
+    if (commentToggle) commentToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleCommentPanel(w.id); });
+    const commentSubmit = document.getElementById(`comment-submit-${w.id}`);
+    if (commentSubmit) commentSubmit.addEventListener('click', () => submitComment(w.id));
+    const commentInput = document.getElementById(`comment-input-${w.id}`);
+    if (commentInput) commentInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') submitComment(w.id); });
+  });
+}
+
+function renderWorkCard(w) {
+  const comments = Storage.getComments(w.id);
+  const isOpen = state.expandedComments.has(w.id);
+  return `
+    <div class="work-card">
+      <div class="work-poster" id="poster-${w.id}" style="background: ${w.gradient}">
+        <div class="work-award-badge">${w.award}</div>
+        <div class="work-play-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="#333"><polygon points="5 3 19 12 5 21 5 3"/></svg></div>
+        <div class="work-poster-overlay">
+          <div style="font-size:16px;font-weight:700;color:white;margin-bottom:2px;text-shadow:0 1px 4px rgba(0,0,0,0.5);">${w.title}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.8);">${w.author}</div>
+        </div>
+      </div>
+      <div class="work-info">
+        <div class="work-title">${w.title}</div>
+        <div class="work-author">${w.author} · ${w.award}</div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:6px;line-height:1.5;">${w.desc}</div>
+      </div>
+      <div class="comments-panel ${isOpen ? 'open' : ''}" id="comments-panel-${w.id}">
+        <div class="comments-inner">
+          <div class="comments-header">
+            <span class="comments-count">评论 (${comments.length})</span>
+            <button class="comment-toggle-btn" id="comment-toggle-${w.id}">${isOpen ? '收起 ▲' : '展开 ▼'}</button>
+          </div>
+          <div class="comment-input-area">
+            <input type="text" class="comment-input" id="comment-input-${w.id}" placeholder="写下你的评论..." maxlength="500">
+            <button class="comment-submit" id="comment-submit-${w.id}">发送</button>
+          </div>
+          <div class="comments-list" id="comments-list-${w.id}">
+            ${comments.length === 0 ? '<div class="no-comments">暂无评论，来发表第一条吧</div>' :
+              comments.map(c => `
+                <div class="comment-item">
+                  <div class="comment-meta"><span class="comment-author">${c.author}</span><span class="comment-time">${c.time}</span></div>
+                  <div class="comment-text">${escapeHtml(c.text)}</div>
+                </div>
+              `).join('')
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ===== 评论功能 =====
+function toggleCommentPanel(workId) {
+  if (state.expandedComments.has(workId)) {
+    state.expandedComments.delete(workId);
+  } else {
+    state.expandedComments.add(workId);
+  }
+  const panel = document.getElementById(`comments-panel-${workId}`);
+  const btn = document.getElementById(`comment-toggle-${workId}`);
+  if (panel) panel.classList.toggle('open');
+  if (btn) btn.textContent = state.expandedComments.has(workId) ? '收起 ▲' : '展开 ▼';
+}
+
+function toggleAllComments() {
+  const contest = CONTESTS.find(c => c.id === state.currentContestId);
+  if (!contest) return;
+  state.allCollapsed = !state.allCollapsed;
+  contest.works.forEach(w => {
+    if (state.allCollapsed) {
+      state.expandedComments.delete(w.id);
+    } else {
+      state.expandedComments.add(w.id);
+    }
+    const panel = document.getElementById(`comments-panel-${w.id}`);
+    const btn = document.getElementById(`comment-toggle-${w.id}`);
+    if (panel) panel.classList.toggle('open', !state.allCollapsed);
+    if (btn) btn.textContent = state.allCollapsed ? '展开 ▼' : '收起 ▲';
+  });
+  document.getElementById('collapse-all-text').textContent = state.allCollapsed ? '展开全部评论' : '折叠全部评论';
+}
+
+function submitComment(workId) {
+  const input = document.getElementById(`comment-input-${workId}`);
+  const text = input.value.trim();
+  if (!text) { showToast('评论内容不能为空', 'info'); return; }
+  Storage.addComment(workId, text);
+  input.value = '';
+  showToast('评论已发布', 'success');
+  const comments = Storage.getComments(workId);
+  const list = document.getElementById(`comments-list-${workId}`);
+  const count = document.querySelector(`#comments-panel-${workId} .comments-count`);
+  if (list) {
+    list.innerHTML = comments.length === 0 ? '<div class="no-comments">暂无评论，来发表第一条吧</div>' :
+      comments.map(c => `
+        <div class="comment-item">
+          <div class="comment-meta"><span class="comment-author">${c.author}</span><span class="comment-time">${c.time}</span></div>
+          <div class="comment-text">${escapeHtml(c.text)}</div>
+        </div>
+      `).join('');
+  }
+  if (count) count.textContent = `评论 (${comments.length})`;
+}
+
+// ===== 赛程功能 =====
+function toggleSchedule(contestId) {
+  if (Storage.isScheduled(contestId)) {
+    Storage.removeFromSchedule(contestId);
+    showToast('已从赛程移除', 'info');
+  } else {
+    Storage.addToSchedule(contestId);
+    showToast('已加入我的赛程', 'success');
+  }
+  updateScheduleBadge();
+  if (state.currentView === 'home') renderHome();
+  else if (state.currentView === 'contest') renderContestDetail();
+  else if (state.currentView === 'schedule') renderSchedule();
+}
+
+// ===== 渲染：我的赛程 =====
+function renderSchedule() {
+  const app = document.getElementById('app');
+  const scheduleIds = Storage.getSchedule();
+  const scheduledContests = CONTESTS.filter(c => scheduleIds.includes(c.id));
+  app.innerHTML = `
+    <div class="hero" style="padding:32px 0 24px;">
+      <h1 class="hero-title" style="font-size:clamp(28px,4vw,44px);">我的赛程</h1>
+      <p class="hero-subtitle">追踪你关注的比赛，不错过任何截止日期</p>
+    </div>
+    ${scheduledContests.length === 0 ? `
+      <div class="empty-state">
+        <div class="empty-state-icon"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
+        <div class="empty-state-text">还没有加入任何比赛</div>
+        <button class="btn-primary" style="margin-top:20px;" onclick="navigate('home')">去浏览赛事</button>
+      </div>
+    ` : `
+      <div class="schedule-list">
+        ${scheduledContests.map(c => {
+          const deadline = getDeadline(c);
+          const countdown = getCountdown(deadline);
+          const { label } = getContestStatus(c);
+          return `
+            <div class="schedule-item">
+              <div class="schedule-item-info" onclick="navigate('contest','${c.id}')">
+                <div class="schedule-item-title">${c.name}</div>
+                <div class="schedule-item-meta">${c.organizer} · 截止 ${deadline.toLocaleDateString('zh-CN')} · ${label}</div>
+              </div>
+              <div class="schedule-item-countdown">
+                ${countdown ? `
+                  <div class="schedule-countdown-number">${countdown.days}</div>
+                  <div class="schedule-countdown-label">天后截止</div>
+                ` : `<div class="schedule-countdown-number" style="color:var(--text-muted);font-size:16px;">已截止</div><div class="schedule-countdown-label">—</div>`}
+              </div>
+              <button class="schedule-remove-btn" onclick="toggleSchedule('${c.id}')">移除</button>
+            </div>
+          `;
+        }).join('')}
+      </div>
+    `}
+  `;
+}
+
+// ===== 主渲染 =====
+function render() {
+  document.getElementById('nav-home').classList.toggle('active', state.currentView === 'home');
+  document.getElementById('nav-schedule').classList.toggle('active', state.currentView === 'schedule');
+  if (state.currentView === 'home') renderHome();
+  else if (state.currentView === 'contest') renderContestDetail();
+  else if (state.currentView === 'schedule') renderSchedule();
+  updateScheduleBadge();
+}
+
+// ===== 初始化 =====
+function init() {
+  const { view, id } = parseHash();
+  state.currentView = view;
+  state.currentContestId = id;
+  render();
+}
+init();
+</script>
+</body>
+</html>
